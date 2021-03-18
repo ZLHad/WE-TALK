@@ -1,0 +1,11 @@
+{
+  "name": "@we-talk/common",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index",
+  "types": "dist/index",
+  "scripts": {
+    "start": "tsc -w --project tsconfig.json",
+    "build": "tsc"
+  }
+}

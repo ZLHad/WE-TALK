@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Message {
+  id         Int         @id @default(autoincrement())
+  fromUserId Int         @map("from_user_id")
+  toUserId   Int         @map("to_user_id")
+  type       MessageType @default(PlanText)
+  content    String
+  read       Boolean     @default(false)
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+  fromUser   User        @relation("message_from_user_idTouser", fields: [fromUserId], references: [id])
+  toUser     User        @relation("message_to_user_idTouser", fields: [toUserId], references: [id])
+
+  @@map("message")
+}
+
+model Relationship {
+  id         Int                @id @default(autoincrement())
+  fromUserId Int                @map("from_user_id")
+  toUserId   Int                @map("to_user_id")
+  status     RelationshipStatus @default(None)
+  createdAt  DateTime           @default(now()) @map("created_at")
+  updatedAt  DateTime           @updatedAt @map("updated_at")
+  fromUser   User               @relation("relationship_from_user_idTouser", fields: [fromUserId], references: [id])
+  toUser     User               @relation("relationship_to_user_idTouser", fields: [toUserId], references: [id])
+
+  @@map("relationship")
+}
+
+model User {
+  id                   Int            @id @default(autoincrement())
+  username             String         @unique
+  password             String
+  avatar               String?
+  nickname             String?
+  intro                String?
+  createdAt            DateTime       @default(now()) @map("created_at")
+  updatedAt            DateTime       @updatedAt @map("updated_at")
+  messageSent          Message[]      @relation("message_from_user_idTouser")
+  messageReceived      Message[]      @relation("message_to_user_idTouser")
+  relationshipSent     Relationship[] @relation("relationship_from_user_idTouser")
+  relationshipReceived Relationship[] @relation("relationship_to_user_idTouser")
+
+  @@map("user")
+}
+
+enum MessageType {
+  PlanText
+
+   @@map("message_type")
+}
+
+enum RelationshipStatus {
+  None
+  Friend
+  Pending
+  Black
+
+   @@map("relationship_status")
+}
